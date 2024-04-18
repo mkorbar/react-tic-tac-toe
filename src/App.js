@@ -1,13 +1,8 @@
-import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
 
 
 function Square({value, onSquareClick}) {
-  // {value} = props
-  // const [value, setValue] = useState(+initial);
-
-
   return <button onClick={onSquareClick} className='square'>{value}</button>
 }
 
@@ -15,13 +10,15 @@ function Square({value, onSquareClick}) {
 function App() {
 
   const [gameState, setGameState] = useState(Array(9).fill(null));
-  // state for next player
+  const [xIsNext, setXisNext] = useState(true);
 
   function handleClick(id){
-    // prohibit re-playing a field
+    if(gameState[id] !== null || calculateWinner(gameState) !== null ) {
+      return
+    }
     const newState = [...gameState];
-    newState[id] = 'X';
-    // toggle next player (set state)
+    newState[id] = xIsNext ? 'X': 'O';
+    setXisNext(!xIsNext)
 
     setGameState(newState);
     // check winner
@@ -45,10 +42,13 @@ function App() {
         return squares[a];
       }
     }
+    if(gameState.indexOf(null) === -1) {
+      return 'none';
+    }
     return null;
   }
 
-  const winner = calculateWinner(squares);
+  const winner = calculateWinner(gameState);
   let status;
   if (winner) {
     status = 'Winner: ' + winner;
