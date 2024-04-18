@@ -1,8 +1,50 @@
 import './App.css';
 import { useState } from 'react';
 
+import { initializeApp } from "firebase/app";
+import { getDatabase, set, get, child, ref, onValue } from 'firebase/database'
 
-function Square({value, onSquareClick}) {
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD6qHRz3ron9zDsUv_ydJInPIy8LXVKo-M",
+  authDomain: "tic-tac-toe-91656.firebaseapp.com",
+  databaseURL: "https://tic-tac-toe-91656-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "tic-tac-toe-91656",
+  storageBucket: "tic-tac-toe-91656.appspot.com",
+  messagingSenderId: "828561504456",
+  appId: "1:828561504456:web:2c1a2c779b78559ea2cdfd"
+};
+
+const DB_NAME = 'tic-tac-toe'
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app)
+
+function writeToDb(state) {
+  set(ref(db, DB_NAME + '/latest'), state);
+}
+
+async function getStateFromDb() {
+  let snapshot = await get(child(ref(db), DB_NAME + '/latest'));
+
+  console.log(snapshot.val());
+  return snapshot;
+}
+
+const tictacRef = ref(db, DB_NAME + '/latest');
+
+onValue(tictacRef, (snapshot) => {
+  const data = snapshot.val();
+
+  console.log(data);
+});
+
+function Square({ value, onSquareClick }) {
   return <button onClick={onSquareClick} className='square'>{value}</button>
 }
 
@@ -17,14 +59,18 @@ function App() {
       return
     }
     const newState = [...gameState];
-    newState[id] = xIsNext ? 'X': 'O';
+    newState[id] = xIsNext ? 'X' : 'O';
     setXisNext(!xIsNext)
 
     setGameState(newState);
-    // check winner
+
+    
+    // getStateFromDb()
+    writeToDb(newState);
+  
   }
 
-  
+
   function calculateWinner(squares) {
     const lines = [
       [0, 1, 2],
@@ -42,7 +88,7 @@ function App() {
         return squares[a];
       }
     }
-    if(gameState.indexOf(null) === -1) {
+    if (gameState.indexOf(null) === -1) {
       return 'none';
     }
     return null;
@@ -59,7 +105,7 @@ function App() {
   // jsx
   return (
     <>
-    <div className='status'>{status}</div>
+      <div className='status'>{status}</div>
       <div className='board-row'>
         <Square value={gameState[0]} onSquareClick={() => handleClick(0)} />
         <Square value={gameState[1]} onSquareClick={() => handleClick(1)} />
