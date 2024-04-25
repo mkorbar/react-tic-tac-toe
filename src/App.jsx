@@ -1,46 +1,8 @@
 import './App.css';
 import { React, useState } from 'react';
-
-import { initializeApp } from 'firebase/app';
-import {
-  getDatabase, set, ref, onValue,
-} from 'firebase/database';
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: 'AIzaSyD6qHRz3ron9zDsUv_ydJInPIy8LXVKo-M',
-  authDomain: 'tic-tac-toe-91656.firebaseapp.com',
-  databaseURL: 'https://tic-tac-toe-91656-default-rtdb.europe-west1.firebasedatabase.app',
-  projectId: 'tic-tac-toe-91656',
-  storageBucket: 'tic-tac-toe-91656.appspot.com',
-  messagingSenderId: '828561504456',
-  appId: '1:828561504456:web:2c1a2c779b78559ea2cdfd',
-};
-
-const DB_NAME = 'tic-tac-toe';
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-function writeToDb(state) {
-  set(ref(db, `${DB_NAME}/latest`), state);
-}
-
-const tictacRef = ref(db, `${DB_NAME}/latest`);
-
-onValue(tictacRef, (snapshot) => {
-  const data = snapshot.val();
-
-  console.log(data);
-});
-
-function Square({ value, onSquareClick }) {
-  return <button onClick={onSquareClick} className="square" type='button'>{value}</button>;
-}
+import {writeToDb as save} from './db/firebase';
+import Square from './Square';
+import ScoreTracker from './ScoreTracker';
 
 function App() {
   const [gameState, setGameState] = useState(Array(9).fill(null));
@@ -57,7 +19,7 @@ function App() {
     setGameState(newState);
 
     // getStateFromDb()
-    writeToDb(newState);
+    save(newState);
   }
 
   function calculateWinner(squares) {
@@ -94,6 +56,7 @@ function App() {
   // jsx
   return (
     <>
+      <h1>Tic tac toe</h1>
       <div className="status">{status}</div>
       <div className="board-row">
         <Square value={gameState[0]} onSquareClick={() => handleClick(0)} />
@@ -110,6 +73,7 @@ function App() {
         <Square value={gameState[7]} onSquareClick={() => handleClick(7)} />
         <Square value={gameState[8]} onSquareClick={() => handleClick(8)} />
       </div>
+      <ScoreTracker/>
     </>
   );
 }
