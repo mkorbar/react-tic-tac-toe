@@ -1,0 +1,42 @@
+
+name: Build, test and deploy my app
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: Build my app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@main
+      - name: Install dependencies
+        run: npm ic
+      - name: Build app
+        run: npm run build
+      - name: Save as atifact
+        uses: actions/upload-artifact@main
+        with:
+          name: Build
+          path: build
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@main
+      - name: Download artifact
+        uses: actions/download-artifact@main
+        with:
+          name: Build 
+          path: build
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@main
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+    
