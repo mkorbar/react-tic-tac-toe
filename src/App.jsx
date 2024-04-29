@@ -50,7 +50,7 @@ function App() {
   if (winner) {
     status = `Winner: ${winner}`;
   } else {
-    status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+    status = `Current player: ${xIsNext ? 'X' : 'O'}`;
   }
 
   // jsx
