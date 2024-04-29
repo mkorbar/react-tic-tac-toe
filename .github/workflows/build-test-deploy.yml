@@ -6,8 +6,19 @@ on:
     branches: ["main"]
 
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checout repo
+        uses: actions/checkout@main
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm run test
   build:
     name: Build my app
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
