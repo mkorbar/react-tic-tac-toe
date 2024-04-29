@@ -17,6 +17,7 @@ jobs:
         run: npm run test
   build:
     name: Build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checout repo
